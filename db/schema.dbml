@@ -1,3 +1,8 @@
+Project production_db {
+  database_type: 'PostgreSQL'
+  Note: 'База данных учета и контроля производственных процессов предприятия'
+}
+
 Enum specification_status {
   Draft
   Active
@@ -83,10 +88,14 @@ Table Specifications {
   ValidFrom date
   ValidTo date
   Status specification_status [not null, default: 'Draft']
-  CreatedAt timestamp [not null]
+  CreatedAt timestamp [not null, default: `CURRENT_TIMESTAMP`]
 
   indexes {
     (ProductId, Version) [unique]
+  }
+
+  checks {
+    `ValidTo >= ValidFrom` [name: 'chk_specification_dates']
   }
 
   Note: 'Версии технологических спецификаций продукции'
@@ -104,6 +113,11 @@ Table SpecificationItems {
     (SpecificationId, MaterialId) [unique]
   }
 
+  checks {
+    `QuantityPerUnit > 0` [name: 'chk_specification_item_quantity']
+    `WastePercent >= 0 AND WastePercent <= 100` [name: 'chk_waste_percent']
+  }
+
   Note: 'Нормативный состав продукции по спецификации'
 }
 
@@ -116,7 +130,12 @@ Table ProductionOrders {
   PlannedStartAt timestamp
   PlannedEndAt timestamp
   Status production_order_status [not null, default: 'Created']
-  CreatedAt timestamp [not null]
+  CreatedAt timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  checks {
+    `PlannedQuantity > 0` [name: 'chk_order_planned_quantity']
+    `PlannedEndAt >= PlannedStartAt` [name: 'chk_order_dates']
+  }
 
   Note: 'Производственные задания предприятия'
 }
@@ -134,6 +153,12 @@ Table ProductionBatches {
 
   indexes {
     (ProductionOrderId, BatchNumber) [unique]
+  }
+
+  checks {
+    `PlannedQuantity > 0` [name: 'chk_batch_planned_quantity']
+    `ActualQuantity >= 0` [name: 'chk_batch_actual_quantity']
+    `CompletedAt >= StartedAt` [name: 'chk_batch_dates']
   }
 
   Note: 'Производственные партии внутри производственного заказа'
@@ -185,6 +210,11 @@ Table Shifts {
     (ShiftDate, ShiftNumber) [unique]
   }
 
+  checks {
+    `ShiftNumber > 0` [name: 'chk_shift_number']
+    `CompletedAt > StartedAt` [name: 'chk_shift_dates']
+  }
+
   Note: 'Производственные смены'
 }
 
@@ -206,6 +236,12 @@ Table BatchOperations {
     (BatchId, SequenceNo) [unique]
   }
 
+  checks {
+    `SequenceNo > 0` [name: 'chk_operation_sequence']
+    `ProcessedQuantity >= 0` [name: 'chk_processed_quantity']
+    `CompletedAt >= StartedAt` [name: 'chk_batch_operation_dates']
+  }
+
   Note: 'Фактическое выполнение технологических операций над партией'
 }
 
@@ -217,7 +253,11 @@ Table MaterialUsage {
   EmployeeId bigint [not null]
   QuantityUsed decimal(18,6) [not null]
   MaterialLotNumber varchar(50)
-  RecordedAt timestamp [not null]
+  RecordedAt timestamp [not null, default: `CURRENT_TIMESTAMP`]
+
+  checks {
+    `QuantityUsed > 0` [name: 'chk_material_usage_quantity']
+  }
 
   Note: 'Фактический расход материалов при производстве партии'
 }
@@ -228,7 +268,7 @@ Table QualityChecks {
   BatchId bigint [not null]
   EmployeeId bigint [not null]
   CheckStage quality_check_stage [not null]
-  CheckedAt timestamp [not null]
+  CheckedAt timestamp [not null, default: `CURRENT_TIMESTAMP`]
   Result quality_check_result [not null]
   Notes text
 
@@ -255,6 +295,14 @@ Table Defects {
   Quantity decimal(18,3) [not null]
   Description text
 
+  indexes {
+    (QualityCheckId, DefectTypeId) [unique]
+  }
+
+  checks {
+    `Quantity > 0` [name: 'chk_defect_quantity']
+  }
+
   Note: 'Конкретные случаи брака, обнаруженные при контроле качества'
 }
 
@@ -263,29 +311,29 @@ Table Defects {
    СВЯЗИ
    ========================= */
 
-Ref: Specifications.ProductId > Products.ProductId
+Ref: Specifications.ProductId > Products.ProductId [delete: restrict]
 
-Ref: SpecificationItems.SpecificationId > Specifications.SpecificationId
-Ref: SpecificationItems.MaterialId > Materials.MaterialId
+Ref: SpecificationItems.SpecificationId > Specifications.SpecificationId [delete: cascade]
+Ref: SpecificationItems.MaterialId > Materials.MaterialId [delete: restrict]
 
-Ref: ProductionOrders.SpecificationId > Specifications.SpecificationId
+Ref: ProductionOrders.SpecificationId > Specifications.SpecificationId [delete: restrict]
 
-Ref: ProductionBatches.ProductionOrderId > ProductionOrders.ProductionOrderId
+Ref: ProductionBatches.ProductionOrderId > ProductionOrders.ProductionOrderId [delete: restrict]
 
-Ref: Shifts.SupervisorEmployeeId > Employees.EmployeeId
+Ref: Shifts.SupervisorEmployeeId > Employees.EmployeeId [delete: restrict]
 
-Ref: BatchOperations.BatchId > ProductionBatches.BatchId
-Ref: BatchOperations.OperationId > Operations.OperationId
-Ref: BatchOperations.ProductionLineId > ProductionLines.ProductionLineId
-Ref: BatchOperations.EmployeeId > Employees.EmployeeId
-Ref: BatchOperations.ShiftId > Shifts.ShiftId
+Ref: BatchOperations.BatchId > ProductionBatches.BatchId [delete: restrict]
+Ref: BatchOperations.OperationId > Operations.OperationId [delete: restrict]
+Ref: BatchOperations.ProductionLineId > ProductionLines.ProductionLineId [delete: restrict]
+Ref: BatchOperations.EmployeeId > Employees.EmployeeId [delete: restrict]
+Ref: BatchOperations.ShiftId > Shifts.ShiftId [delete: restrict]
 
-Ref: MaterialUsage.BatchId > ProductionBatches.BatchId
-Ref: MaterialUsage.MaterialId > Materials.MaterialId
-Ref: MaterialUsage.EmployeeId > Employees.EmployeeId
+Ref: MaterialUsage.BatchId > ProductionBatches.BatchId [delete: restrict]
+Ref: MaterialUsage.MaterialId > Materials.MaterialId [delete: restrict]
+Ref: MaterialUsage.EmployeeId > Employees.EmployeeId [delete: restrict]
 
-Ref: QualityChecks.BatchId > ProductionBatches.BatchId
-Ref: QualityChecks.EmployeeId > Employees.EmployeeId
+Ref: QualityChecks.BatchId > ProductionBatches.BatchId [delete: restrict]
+Ref: QualityChecks.EmployeeId > Employees.EmployeeId [delete: restrict]
 
-Ref: Defects.QualityCheckId > QualityChecks.QualityCheckId
-Ref: Defects.DefectTypeId > DefectTypes.DefectTypeId
+Ref: Defects.QualityCheckId > QualityChecks.QualityCheckId [delete: cascade]
+Ref: Defects.DefectTypeId > DefectTypes.DefectTypeId [delete: restrict]
