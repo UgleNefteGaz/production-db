@@ -1,0 +1,291 @@
+Enum specification_status {
+  Draft
+  Active
+  Archived
+}
+
+Enum production_order_status {
+  Created
+  Planned
+  InProgress
+  Completed
+  Cancelled
+}
+
+Enum production_batch_status {
+  Planned
+  InProgress
+  Completed
+  Rejected
+  Cancelled
+}
+
+Enum production_line_status {
+  Active
+  Maintenance
+  Inactive
+}
+
+Enum batch_operation_status {
+  Planned
+  InProgress
+  Completed
+  Cancelled
+}
+
+Enum quality_check_stage {
+  Intermediate
+  Final
+}
+
+Enum quality_check_result {
+  Passed
+  Failed
+  Conditional
+}
+
+Enum defect_severity {
+  Minor
+  Major
+  Critical
+}
+
+
+Table Products {
+  ProductId bigint [pk, increment]
+  Name varchar(200) [not null]
+  Article varchar(50) [not null, unique]
+  Unit varchar(20) [not null]
+  Description text
+  IsActive boolean [not null, default: true]
+
+  Note: 'Справочник готовой продукции предприятия'
+}
+
+
+Table Materials {
+  MaterialId bigint [pk, increment]
+  Code varchar(50) [not null, unique]
+  Name varchar(200) [not null]
+  Unit varchar(20) [not null]
+  Description text
+  IsActive boolean [not null, default: true]
+
+  Note: 'Справочник сырья, комплектующих и упаковочных материалов'
+}
+
+
+Table Specifications {
+  SpecificationId bigint [pk, increment]
+  ProductId bigint [not null]
+  Version varchar(20) [not null]
+  Name varchar(150) [not null]
+  ValidFrom date
+  ValidTo date
+  Status specification_status [not null, default: 'Draft']
+  CreatedAt timestamp [not null]
+
+  indexes {
+    (ProductId, Version) [unique]
+  }
+
+  Note: 'Версии технологических спецификаций продукции'
+}
+
+
+Table SpecificationItems {
+  SpecificationItemId bigint [pk, increment]
+  SpecificationId bigint [not null]
+  MaterialId bigint [not null]
+  QuantityPerUnit decimal(18,6) [not null]
+  WastePercent decimal(5,2) [not null, default: 0]
+
+  indexes {
+    (SpecificationId, MaterialId) [unique]
+  }
+
+  Note: 'Нормативный состав продукции по спецификации'
+}
+
+
+Table ProductionOrders {
+  ProductionOrderId bigint [pk, increment]
+  OrderNumber varchar(50) [not null, unique]
+  SpecificationId bigint [not null]
+  PlannedQuantity decimal(18,3) [not null]
+  PlannedStartAt timestamp
+  PlannedEndAt timestamp
+  Status production_order_status [not null, default: 'Created']
+  CreatedAt timestamp [not null]
+
+  Note: 'Производственные задания предприятия'
+}
+
+
+Table ProductionBatches {
+  BatchId bigint [pk, increment]
+  ProductionOrderId bigint [not null]
+  BatchNumber varchar(50) [not null]
+  PlannedQuantity decimal(18,3) [not null]
+  ActualQuantity decimal(18,3)
+  StartedAt timestamp
+  CompletedAt timestamp
+  Status production_batch_status [not null, default: 'Planned']
+
+  indexes {
+    (ProductionOrderId, BatchNumber) [unique]
+  }
+
+  Note: 'Производственные партии внутри производственного заказа'
+}
+
+
+Table ProductionLines {
+  ProductionLineId bigint [pk, increment]
+  Code varchar(30) [not null, unique]
+  Name varchar(100) [not null]
+  Location varchar(100)
+  Status production_line_status [not null, default: 'Active']
+  Description text
+
+  Note: 'Производственные линии и рабочие центры'
+}
+
+
+Table Operations {
+  OperationId bigint [pk, increment]
+  Code varchar(30) [not null, unique]
+  Name varchar(100) [not null]
+  Description text
+
+  Note: 'Справочник технологических операций'
+}
+
+
+Table Employees {
+  EmployeeId bigint [pk, increment]
+  PersonnelNumber varchar(30) [not null, unique]
+  FullName varchar(150) [not null]
+  Position varchar(100) [not null]
+  IsActive boolean [not null, default: true]
+
+  Note: 'Сотрудники, участвующие в производственном процессе'
+}
+
+
+Table Shifts {
+  ShiftId bigint [pk, increment]
+  ShiftDate date [not null]
+  ShiftNumber int [not null]
+  StartedAt timestamp [not null]
+  CompletedAt timestamp [not null]
+  SupervisorEmployeeId bigint [not null]
+
+  indexes {
+    (ShiftDate, ShiftNumber) [unique]
+  }
+
+  Note: 'Производственные смены'
+}
+
+
+Table BatchOperations {
+  BatchOperationId bigint [pk, increment]
+  BatchId bigint [not null]
+  OperationId bigint [not null]
+  ProductionLineId bigint [not null]
+  EmployeeId bigint [not null]
+  ShiftId bigint [not null]
+  SequenceNo int [not null]
+  StartedAt timestamp
+  CompletedAt timestamp
+  ProcessedQuantity decimal(18,3)
+  Status batch_operation_status [not null, default: 'Planned']
+
+  indexes {
+    (BatchId, SequenceNo) [unique]
+  }
+
+  Note: 'Фактическое выполнение технологических операций над партией'
+}
+
+
+Table MaterialUsage {
+  MaterialUsageId bigint [pk, increment]
+  BatchId bigint [not null]
+  MaterialId bigint [not null]
+  EmployeeId bigint [not null]
+  QuantityUsed decimal(18,6) [not null]
+  MaterialLotNumber varchar(50)
+  RecordedAt timestamp [not null]
+
+  Note: 'Фактический расход материалов при производстве партии'
+}
+
+
+Table QualityChecks {
+  QualityCheckId bigint [pk, increment]
+  BatchId bigint [not null]
+  EmployeeId bigint [not null]
+  CheckStage quality_check_stage [not null]
+  CheckedAt timestamp [not null]
+  Result quality_check_result [not null]
+  Notes text
+
+  Note: 'Результаты контроля качества производственной партии'
+}
+
+
+Table DefectTypes {
+  DefectTypeId bigint [pk, increment]
+  Code varchar(30) [not null, unique]
+  Name varchar(100) [not null]
+  Severity defect_severity [not null]
+  Description text
+  IsActive boolean [not null, default: true]
+
+  Note: 'Справочник типов производственного брака'
+}
+
+
+Table Defects {
+  DefectId bigint [pk, increment]
+  QualityCheckId bigint [not null]
+  DefectTypeId bigint [not null]
+  Quantity decimal(18,3) [not null]
+  Description text
+
+  Note: 'Конкретные случаи брака, обнаруженные при контроле качества'
+}
+
+
+/* =========================
+   СВЯЗИ
+   ========================= */
+
+Ref: Specifications.ProductId > Products.ProductId
+
+Ref: SpecificationItems.SpecificationId > Specifications.SpecificationId
+Ref: SpecificationItems.MaterialId > Materials.MaterialId
+
+Ref: ProductionOrders.SpecificationId > Specifications.SpecificationId
+
+Ref: ProductionBatches.ProductionOrderId > ProductionOrders.ProductionOrderId
+
+Ref: Shifts.SupervisorEmployeeId > Employees.EmployeeId
+
+Ref: BatchOperations.BatchId > ProductionBatches.BatchId
+Ref: BatchOperations.OperationId > Operations.OperationId
+Ref: BatchOperations.ProductionLineId > ProductionLines.ProductionLineId
+Ref: BatchOperations.EmployeeId > Employees.EmployeeId
+Ref: BatchOperations.ShiftId > Shifts.ShiftId
+
+Ref: MaterialUsage.BatchId > ProductionBatches.BatchId
+Ref: MaterialUsage.MaterialId > Materials.MaterialId
+Ref: MaterialUsage.EmployeeId > Employees.EmployeeId
+
+Ref: QualityChecks.BatchId > ProductionBatches.BatchId
+Ref: QualityChecks.EmployeeId > Employees.EmployeeId
+
+Ref: Defects.QualityCheckId > QualityChecks.QualityCheckId
+Ref: Defects.DefectTypeId > DefectTypes.DefectTypeId
