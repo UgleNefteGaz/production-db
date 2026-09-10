@@ -4,8 +4,8 @@ BEGIN;
 -- PRODUCTS
 -- ============================================================
 
-INSERT INTO "Products"
-    ("Name", "Article", "Unit", "Description")
+INSERT INTO products
+    (name, article, unit, description)
 VALUES
     ('Шампунь 500 мл', 'SH500', 'шт',
      'Шампунь во флаконе объемом 500 мл');
@@ -15,8 +15,8 @@ VALUES
 -- MATERIALS
 -- ============================================================
 
-INSERT INTO "Materials"
-    ("Code", "Name", "Unit", "Description")
+INSERT INTO materials
+    (code, name, unit, description)
 VALUES
     ('MAT001', 'Основа шампуня', 'кг', 'Готовая смесь для розлива'),
     ('MAT002', 'Флакон 500 мл', 'шт', 'Пластиковый флакон'),
@@ -29,19 +29,19 @@ VALUES
 -- SPECIFICATIONS
 -- ============================================================
 
-INSERT INTO "Specifications"
+INSERT INTO specifications
     (
-        "ProductId",
-        "Version",
-        "Name",
-        "ValidFrom",
-        "Status"
+        product_id,
+        version,
+        name,
+        valid_from,
+        status
     )
 VALUES
     (
-        (SELECT "ProductId"
-         FROM "Products"
-         WHERE "Article" = 'SH500'),
+        (SELECT product_id
+         FROM products
+         WHERE article = 'SH500'),
         '1.0',
         'Спецификация SH500',
         '2026-09-01',
@@ -53,66 +53,66 @@ VALUES
 -- SPECIFICATION ITEMS
 -- ============================================================
 
-INSERT INTO "SpecificationItems"
+INSERT INTO specification_items
     (
-        "SpecificationId",
-        "MaterialId",
-        "QuantityPerUnit",
-        "WastePercent"
+        specification_id,
+        material_id,
+        quantity_per_unit,
+        waste_percent
     )
 VALUES
     (
-        (SELECT "SpecificationId"
-         FROM "Specifications"
-         WHERE "Name" = 'Спецификация SH500'
-           AND "Version" = '1.0'),
-        (SELECT "MaterialId"
-         FROM "Materials"
-         WHERE "Code" = 'MAT001'),
+        (SELECT specification_id
+         FROM specifications
+         WHERE name = 'Спецификация SH500'
+           AND version = '1.0'),
+        (SELECT material_id
+         FROM materials
+         WHERE code = 'MAT001'),
         0.500000,
         1.00
     ),
     (
-        (SELECT "SpecificationId"
-         FROM "Specifications"
-         WHERE "Name" = 'Спецификация SH500'
-           AND "Version" = '1.0'),
-        (SELECT "MaterialId"
-         FROM "Materials"
-         WHERE "Code" = 'MAT002'),
+        (SELECT specification_id
+         FROM specifications
+         WHERE name = 'Спецификация SH500'
+           AND version = '1.0'),
+        (SELECT material_id
+         FROM materials
+         WHERE code = 'MAT002'),
         1.000000,
         1.00
     ),
     (
-        (SELECT "SpecificationId"
-         FROM "Specifications"
-         WHERE "Name" = 'Спецификация SH500'
-           AND "Version" = '1.0'),
-        (SELECT "MaterialId"
-         FROM "Materials"
-         WHERE "Code" = 'MAT003'),
+        (SELECT specification_id
+         FROM specifications
+         WHERE name = 'Спецификация SH500'
+           AND version = '1.0'),
+        (SELECT material_id
+         FROM materials
+         WHERE code = 'MAT003'),
         1.000000,
         1.00
     ),
     (
-        (SELECT "SpecificationId"
-         FROM "Specifications"
-         WHERE "Name" = 'Спецификация SH500'
-           AND "Version" = '1.0'),
-        (SELECT "MaterialId"
-         FROM "Materials"
-         WHERE "Code" = 'MAT004'),
+        (SELECT specification_id
+         FROM specifications
+         WHERE name = 'Спецификация SH500'
+           AND version = '1.0'),
+        (SELECT material_id
+         FROM materials
+         WHERE code = 'MAT004'),
         1.000000,
         1.00
     ),
     (
-        (SELECT "SpecificationId"
-         FROM "Specifications"
-         WHERE "Name" = 'Спецификация SH500'
-           AND "Version" = '1.0'),
-        (SELECT "MaterialId"
-         FROM "Materials"
-         WHERE "Code" = 'MAT005'),
+        (SELECT specification_id
+         FROM specifications
+         WHERE name = 'Спецификация SH500'
+           AND version = '1.0'),
+        (SELECT material_id
+         FROM materials
+         WHERE code = 'MAT005'),
         0.050000,
         2.00
     );
@@ -122,8 +122,8 @@ VALUES
 -- PRODUCTION LINES
 -- ============================================================
 
-INSERT INTO "ProductionLines"
-    ("Code", "Name", "Location", "Description")
+INSERT INTO production_lines
+    (code, name, location, description)
 VALUES
     ('MIX01', 'Линия приготовления смеси', 'Цех 1',
      'Приготовление продукта'),
@@ -137,8 +137,8 @@ VALUES
 -- OPERATIONS
 -- ============================================================
 
-INSERT INTO "Operations"
-    ("Code", "Name", "Description")
+INSERT INTO operations
+    (code, name, description)
 VALUES
     ('OP001', 'Приготовление смеси',
      'Подготовка продукта к розливу'),
@@ -154,8 +154,8 @@ VALUES
 -- EMPLOYEES
 -- ============================================================
 
-INSERT INTO "Employees"
-    ("PersonnelNumber", "FullName", "Position")
+INSERT INTO employees
+    (personnel_number, full_name, position)
 VALUES
     ('EMP001', 'Иванов Иван Иванович', 'Мастер смены'),
     ('EMP002', 'Петров Петр Сергеевич', 'Оператор приготовления'),
@@ -168,13 +168,13 @@ VALUES
 -- SHIFTS
 -- ============================================================
 
-INSERT INTO "Shifts"
+INSERT INTO shifts
     (
-        "ShiftDate",
-        "ShiftNumber",
-        "StartedAt",
-        "CompletedAt",
-        "SupervisorEmployeeId"
+        shift_date,
+        shift_number,
+        started_at,
+        completed_at,
+        supervisor_employee_id
     )
 VALUES
     (
@@ -182,18 +182,18 @@ VALUES
         1,
         '2026-09-09 08:00:00',
         '2026-09-09 20:00:00',
-        (SELECT "EmployeeId"
-         FROM "Employees"
-         WHERE "PersonnelNumber" = 'EMP001')
+        (SELECT employee_id
+         FROM employees
+         WHERE personnel_number = 'EMP001')
     ),
     (
         '2026-09-10',
         1,
         '2026-09-10 08:00:00',
         '2026-09-10 20:00:00',
-        (SELECT "EmployeeId"
-         FROM "Employees"
-         WHERE "PersonnelNumber" = 'EMP001')
+        (SELECT employee_id
+         FROM employees
+         WHERE personnel_number = 'EMP001')
     );
 
 
@@ -201,22 +201,22 @@ VALUES
 -- PRODUCTION ORDER
 -- ============================================================
 
-INSERT INTO "ProductionOrders"
+INSERT INTO production_orders
     (
-        "OrderNumber",
-        "SpecificationId",
-        "PlannedQuantity",
-        "PlannedStartAt",
-        "PlannedEndAt",
-        "Status"
+        order_number,
+        specification_id,
+        planned_quantity,
+        planned_start_at,
+        planned_end_at,
+        status
     )
 VALUES
     (
         'PO-2026-001',
-        (SELECT "SpecificationId"
-         FROM "Specifications"
-         WHERE "Name" = 'Спецификация SH500'
-           AND "Version" = '1.0'),
+        (SELECT specification_id
+         FROM specifications
+         WHERE name = 'Спецификация SH500'
+           AND version = '1.0'),
         1000,
         '2026-09-09 08:00:00',
         '2026-09-10 18:00:00',
@@ -228,21 +228,21 @@ VALUES
 -- PRODUCTION BATCHES
 -- ============================================================
 
-INSERT INTO "ProductionBatches"
+INSERT INTO production_batches
     (
-        "ProductionOrderId",
-        "BatchNumber",
-        "PlannedQuantity",
-        "ActualQuantity",
-        "StartedAt",
-        "CompletedAt",
-        "Status"
+        production_order_id,
+        batch_number,
+        planned_quantity,
+        actual_quantity,
+        started_at,
+        completed_at,
+        status
     )
 VALUES
     (
-        (SELECT "ProductionOrderId"
-         FROM "ProductionOrders"
-         WHERE "OrderNumber" = 'PO-2026-001'),
+        (SELECT production_order_id
+         FROM production_orders
+         WHERE order_number = 'PO-2026-001'),
         'BATCH-001',
         500,
         500,
@@ -251,9 +251,9 @@ VALUES
         'Completed'
     ),
     (
-        (SELECT "ProductionOrderId"
-         FROM "ProductionOrders"
-         WHERE "OrderNumber" = 'PO-2026-001'),
+        (SELECT production_order_id
+         FROM production_orders
+         WHERE order_number = 'PO-2026-001'),
         'BATCH-002',
         500,
         493,
@@ -267,35 +267,35 @@ VALUES
 -- BATCH OPERATIONS
 -- ============================================================
 
-INSERT INTO "BatchOperations"
+INSERT INTO batch_operations
     (
-        "BatchId",
-        "OperationId",
-        "ProductionLineId",
-        "EmployeeId",
-        "ShiftId",
-        "SequenceNo",
-        "StartedAt",
-        "CompletedAt",
-        "ProcessedQuantity",
-        "Status"
+        batch_id,
+        operation_id,
+        production_line_id,
+        employee_id,
+        shift_id,
+        sequence_no,
+        started_at,
+        completed_at,
+        processed_quantity,
+        status
     )
 VALUES
 
 -- BATCH-001
 
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "OperationId" FROM "Operations"
-     WHERE "Code" = 'OP001'),
-    (SELECT "ProductionLineId" FROM "ProductionLines"
-     WHERE "Code" = 'MIX01'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP002'),
-    (SELECT "ShiftId" FROM "Shifts"
-     WHERE "ShiftDate" = '2026-09-09'
-       AND "ShiftNumber" = 1),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT operation_id FROM operations
+     WHERE code = 'OP001'),
+    (SELECT production_line_id FROM production_lines
+     WHERE code = 'MIX01'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP002'),
+    (SELECT shift_id FROM shifts
+     WHERE shift_date = '2026-09-09'
+       AND shift_number = 1),
     1,
     '2026-09-09 08:15:00',
     '2026-09-09 10:00:00',
@@ -303,17 +303,17 @@ VALUES
     'Completed'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "OperationId" FROM "Operations"
-     WHERE "Code" = 'OP002'),
-    (SELECT "ProductionLineId" FROM "ProductionLines"
-     WHERE "Code" = 'FILL01'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP003'),
-    (SELECT "ShiftId" FROM "Shifts"
-     WHERE "ShiftDate" = '2026-09-09'
-       AND "ShiftNumber" = 1),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT operation_id FROM operations
+     WHERE code = 'OP002'),
+    (SELECT production_line_id FROM production_lines
+     WHERE code = 'FILL01'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP003'),
+    (SELECT shift_id FROM shifts
+     WHERE shift_date = '2026-09-09'
+       AND shift_number = 1),
     2,
     '2026-09-09 10:15:00',
     '2026-09-09 13:00:00',
@@ -321,17 +321,17 @@ VALUES
     'Completed'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "OperationId" FROM "Operations"
-     WHERE "Code" = 'OP003'),
-    (SELECT "ProductionLineId" FROM "ProductionLines"
-     WHERE "Code" = 'PACK01'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP003'),
-    (SELECT "ShiftId" FROM "Shifts"
-     WHERE "ShiftDate" = '2026-09-09'
-       AND "ShiftNumber" = 1),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT operation_id FROM operations
+     WHERE code = 'OP003'),
+    (SELECT production_line_id FROM production_lines
+     WHERE code = 'PACK01'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP003'),
+    (SELECT shift_id FROM shifts
+     WHERE shift_date = '2026-09-09'
+       AND shift_number = 1),
     3,
     '2026-09-09 13:15:00',
     '2026-09-09 15:00:00',
@@ -339,17 +339,17 @@ VALUES
     'Completed'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "OperationId" FROM "Operations"
-     WHERE "Code" = 'OP004'),
-    (SELECT "ProductionLineId" FROM "ProductionLines"
-     WHERE "Code" = 'PACK01'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP003'),
-    (SELECT "ShiftId" FROM "Shifts"
-     WHERE "ShiftDate" = '2026-09-09'
-       AND "ShiftNumber" = 1),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT operation_id FROM operations
+     WHERE code = 'OP004'),
+    (SELECT production_line_id FROM production_lines
+     WHERE code = 'PACK01'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP003'),
+    (SELECT shift_id FROM shifts
+     WHERE shift_date = '2026-09-09'
+       AND shift_number = 1),
     4,
     '2026-09-09 15:10:00',
     '2026-09-09 17:00:00',
@@ -360,17 +360,17 @@ VALUES
 -- BATCH-002
 
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "OperationId" FROM "Operations"
-     WHERE "Code" = 'OP001'),
-    (SELECT "ProductionLineId" FROM "ProductionLines"
-     WHERE "Code" = 'MIX01'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP002'),
-    (SELECT "ShiftId" FROM "Shifts"
-     WHERE "ShiftDate" = '2026-09-10'
-       AND "ShiftNumber" = 1),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT operation_id FROM operations
+     WHERE code = 'OP001'),
+    (SELECT production_line_id FROM production_lines
+     WHERE code = 'MIX01'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP002'),
+    (SELECT shift_id FROM shifts
+     WHERE shift_date = '2026-09-10'
+       AND shift_number = 1),
     1,
     '2026-09-10 08:10:00',
     '2026-09-10 10:00:00',
@@ -378,17 +378,17 @@ VALUES
     'Completed'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "OperationId" FROM "Operations"
-     WHERE "Code" = 'OP002'),
-    (SELECT "ProductionLineId" FROM "ProductionLines"
-     WHERE "Code" = 'FILL01'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP003'),
-    (SELECT "ShiftId" FROM "Shifts"
-     WHERE "ShiftDate" = '2026-09-10'
-       AND "ShiftNumber" = 1),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT operation_id FROM operations
+     WHERE code = 'OP002'),
+    (SELECT production_line_id FROM production_lines
+     WHERE code = 'FILL01'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP003'),
+    (SELECT shift_id FROM shifts
+     WHERE shift_date = '2026-09-10'
+       AND shift_number = 1),
     2,
     '2026-09-10 10:15:00',
     '2026-09-10 13:10:00',
@@ -396,17 +396,17 @@ VALUES
     'Completed'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "OperationId" FROM "Operations"
-     WHERE "Code" = 'OP003'),
-    (SELECT "ProductionLineId" FROM "ProductionLines"
-     WHERE "Code" = 'PACK01'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP003'),
-    (SELECT "ShiftId" FROM "Shifts"
-     WHERE "ShiftDate" = '2026-09-10'
-       AND "ShiftNumber" = 1),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT operation_id FROM operations
+     WHERE code = 'OP003'),
+    (SELECT production_line_id FROM production_lines
+     WHERE code = 'PACK01'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP003'),
+    (SELECT shift_id FROM shifts
+     WHERE shift_date = '2026-09-10'
+       AND shift_number = 1),
     3,
     '2026-09-10 13:20:00',
     '2026-09-10 15:15:00',
@@ -414,17 +414,17 @@ VALUES
     'Completed'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "OperationId" FROM "Operations"
-     WHERE "Code" = 'OP004'),
-    (SELECT "ProductionLineId" FROM "ProductionLines"
-     WHERE "Code" = 'PACK01'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP003'),
-    (SELECT "ShiftId" FROM "Shifts"
-     WHERE "ShiftDate" = '2026-09-10'
-       AND "ShiftNumber" = 1),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT operation_id FROM operations
+     WHERE code = 'OP004'),
+    (SELECT production_line_id FROM production_lines
+     WHERE code = 'PACK01'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP003'),
+    (SELECT shift_id FROM shifts
+     WHERE shift_date = '2026-09-10'
+       AND shift_number = 1),
     4,
     '2026-09-10 15:25:00',
     '2026-09-10 17:15:00',
@@ -437,70 +437,70 @@ VALUES
 -- MATERIAL USAGE
 -- ============================================================
 
-INSERT INTO "MaterialUsage"
+INSERT INTO material_usage
     (
-        "BatchId",
-        "MaterialId",
-        "EmployeeId",
-        "QuantityUsed",
-        "MaterialLotNumber",
-        "RecordedAt"
+        batch_id,
+        material_id,
+        employee_id,
+        quantity_used,
+        material_lot_number,
+        recorded_at
     )
 VALUES
 
 -- BATCH-001
 
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT001'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT001'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     252.000000,
     'LOT-BASE-001',
     '2026-09-09 08:10:00'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT002'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT002'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     503,
     'LOT-BOTTLE-001',
     '2026-09-09 10:05:00'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT003'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT003'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     501,
     'LOT-CAP-001',
     '2026-09-09 10:05:00'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT004'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT004'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     505,
     'LOT-LABEL-001',
     '2026-09-09 13:10:00'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-001'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT005'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-001'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT005'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     26,
     'LOT-BOX-001',
     '2026-09-09 15:05:00'
@@ -509,56 +509,56 @@ VALUES
 -- BATCH-002
 
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT001'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT001'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     253.000000,
     'LOT-BASE-001',
     '2026-09-10 08:05:00'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT002'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT002'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     504,
     'LOT-BOTTLE-001',
     '2026-09-10 10:05:00'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT003'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT003'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     503,
     'LOT-CAP-001',
     '2026-09-10 10:05:00'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT004'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT004'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     506,
     'LOT-LABEL-001',
     '2026-09-10 13:15:00'
 ),
 (
-    (SELECT "BatchId" FROM "ProductionBatches"
-     WHERE "BatchNumber" = 'BATCH-002'),
-    (SELECT "MaterialId" FROM "Materials"
-     WHERE "Code" = 'MAT005'),
-    (SELECT "EmployeeId" FROM "Employees"
-     WHERE "PersonnelNumber" = 'EMP005'),
+    (SELECT batch_id FROM production_batches
+     WHERE batch_number = 'BATCH-002'),
+    (SELECT material_id FROM materials
+     WHERE code = 'MAT005'),
+    (SELECT employee_id FROM employees
+     WHERE personnel_number = 'EMP005'),
     26,
     'LOT-BOX-001',
     '2026-09-10 15:20:00'
@@ -569,35 +569,35 @@ VALUES
 -- QUALITY CHECKS
 -- ============================================================
 
-INSERT INTO "QualityChecks"
+INSERT INTO quality_checks
     (
-        "BatchId",
-        "EmployeeId",
-        "CheckStage",
-        "CheckedAt",
-        "Result",
-        "Notes"
+        batch_id,
+        employee_id,
+        check_stage,
+        checked_at,
+        result,
+        notes
     )
 VALUES
     (
-        (SELECT "BatchId"
-         FROM "ProductionBatches"
-         WHERE "BatchNumber" = 'BATCH-001'),
-        (SELECT "EmployeeId"
-         FROM "Employees"
-         WHERE "PersonnelNumber" = 'EMP004'),
+        (SELECT batch_id
+         FROM production_batches
+         WHERE batch_number = 'BATCH-001'),
+        (SELECT employee_id
+         FROM employees
+         WHERE personnel_number = 'EMP004'),
         'Final',
         '2026-09-09 17:20:00',
         'Passed',
         'Партия соответствует требованиям качества'
     ),
     (
-        (SELECT "BatchId"
-         FROM "ProductionBatches"
-         WHERE "BatchNumber" = 'BATCH-002'),
-        (SELECT "EmployeeId"
-         FROM "Employees"
-         WHERE "PersonnelNumber" = 'EMP004'),
+        (SELECT batch_id
+         FROM production_batches
+         WHERE batch_number = 'BATCH-002'),
+        (SELECT employee_id
+         FROM employees
+         WHERE personnel_number = 'EMP004'),
         'Final',
         '2026-09-10 17:30:00',
         'Conditional',
@@ -609,8 +609,8 @@ VALUES
 -- DEFECT TYPES
 -- ============================================================
 
-INSERT INTO "DefectTypes"
-    ("Code", "Name", "Severity", "Description")
+INSERT INTO defect_types
+    (code, name, severity, description)
 VALUES
     ('DEF001', 'Недолив', 'Major',
      'Объем продукта ниже установленного значения'),
@@ -624,41 +624,41 @@ VALUES
 -- DEFECTS
 -- ============================================================
 
-INSERT INTO "Defects"
+INSERT INTO defects
     (
-        "QualityCheckId",
-        "DefectTypeId",
-        "Quantity",
-        "Description"
+        quality_check_id,
+        defect_type_id,
+        quantity,
+        description
     )
 VALUES
     (
         (
-            SELECT qc."QualityCheckId"
-            FROM "QualityChecks" qc
-            JOIN "ProductionBatches" pb
-              ON pb."BatchId" = qc."BatchId"
-            WHERE pb."BatchNumber" = 'BATCH-002'
-              AND qc."CheckStage" = 'Final'
+            SELECT qc.quality_check_id
+            FROM quality_checks qc
+            JOIN production_batches pb
+              ON pb.batch_id = qc.batch_id
+            WHERE pb.batch_number = 'BATCH-002'
+              AND qc.check_stage = 'Final'
         ),
-        (SELECT "DefectTypeId"
-         FROM "DefectTypes"
-         WHERE "Code" = 'DEF002'),
+        (SELECT defect_type_id
+         FROM defect_types
+         WHERE code = 'DEF002'),
         4,
         'Обнаружены поврежденные флаконы'
     ),
     (
         (
-            SELECT qc."QualityCheckId"
-            FROM "QualityChecks" qc
-            JOIN "ProductionBatches" pb
-              ON pb."BatchId" = qc."BatchId"
-            WHERE pb."BatchNumber" = 'BATCH-002'
-              AND qc."CheckStage" = 'Final'
+            SELECT qc.quality_check_id
+            FROM quality_checks qc
+            JOIN production_batches pb
+              ON pb.batch_id = qc.batch_id
+            WHERE pb.batch_number = 'BATCH-002'
+              AND qc.check_stage = 'Final'
         ),
-        (SELECT "DefectTypeId"
-         FROM "DefectTypes"
-         WHERE "Code" = 'DEF003'),
+        (SELECT defect_type_id
+         FROM defect_types
+         WHERE code = 'DEF003'),
         3,
         'Обнаружены дефекты этикетирования'
     );

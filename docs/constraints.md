@@ -13,51 +13,51 @@
 - DEFAULT для значений, устанавливаемых автоматически.
 
 Удаление основных производственных данных должно быть ограничено.
-Для справочных записей вместо удаления преимущественно используется признак `IsActive`.
+Для справочных записей вместо удаления преимущественно используется признак `is_active`.
 
 ---
 
-## 2. Products
+## 2. products
 
 ### Обязательные поля
 
-- ProductId
-- Name
-- Article
-- Unit
-- Description
-- IsActive
+- product_id
+- name
+- article
+- unit
+- description
+- is_active
 
 ### Ограничения
 
-- ProductId - PRIMARY KEY;
-- Article - UNIQUE;
-- IsActive - DEFAULT true.
+- product_id - PRIMARY KEY;
+- article - UNIQUE;
+- is_active - DEFAULT true.
 
 ### Удаление
 
 Удаление продукта запрещается, если существуют связанные спецификации.
 
-`Specifications.ProductId -> Products.ProductId ON DELETE RESTRICT`
+`specifications.product_id -> products.product_id ON DELETE RESTRICT`
 
 ---
 
-## 3. Materials
+## 3. materials
 
 ### Обязательные поля
 
-- MaterialId
-- Code
-- Name
-- Unit
-- Description
-- IsActive
+- material_id
+- code
+- name
+- unit
+- description
+- is_active
 
 ### Ограничения
 
-- MaterialId - PRIMARY KEY;
-- Code - UNIQUE;
-- IsActive - DEFAULT true.
+- material_id - PRIMARY KEY;
+- code - UNIQUE;
+- is_active - DEFAULT true.
 
 ### Удаление
 
@@ -66,32 +66,32 @@
 - в спецификациях;
 - в фактическом расходе материалов.
 
-`SpecificationItems.MaterialId -> Materials.MaterialId ON DELETE RESTRICT`
+`specification_items.material_id -> materials.material_id ON DELETE RESTRICT`
 
-`MaterialUsage.MaterialId -> Materials.MaterialId ON DELETE RESTRICT`
+`material_usage.material_id -> materials.material_id ON DELETE RESTRICT`
 
 ---
 
-## 4. Specifications
+## 4. specifications
 
 ### Обязательные поля
 
-- SpecificationId
-- ProductId
-- Version
-- Name
-- ValidFrom
-- ValidTo
-- Status
-- CreatedAt
+- specification_id
+- product_id
+- version
+- name
+- valid_from
+- valid_to
+- status
+- created_at
 
 ### Ограничения
 
-- SpecificationId - PRIMARY KEY;
-- ProductId - FOREIGN KEY;
-- комбинация ProductId + Version - UNIQUE;
-- ValidTo не может быть меньше ValidFrom;
-- CreatedAt - DEFAULT CURRENT_TIMESTAMP.
+- specification_id - PRIMARY KEY;
+- product_id - FOREIGN KEY;
+- комбинация product_id + version - UNIQUE;
+- valid_to не может быть меньше valid_from;
+- created_at - DEFAULT CURRENT_TIMESTAMP.
 
 ### Дополнительное правило
 
@@ -101,114 +101,114 @@
 
 Продукт:
 
-`Specifications.ProductId -> Products.ProductId ON DELETE RESTRICT`
+`specifications.product_id -> products.product_id ON DELETE RESTRICT`
 
 Строки состава спецификации:
 
-`SpecificationItems.SpecificationId -> Specifications.SpecificationId ON DELETE CASCADE`
+`specification_items.specification_id -> specifications.specification_id ON DELETE CASCADE`
 
 Если удаляется спецификация, ее состав удаляется автоматически.
 
 Удаление спецификации запрещается, если на нее существуют производственные заказы:
 
-`ProductionOrders.SpecificationId -> Specifications.SpecificationId ON DELETE RESTRICT`
+`production_orders.specification_id -> specifications.specification_id ON DELETE RESTRICT`
 
 ---
 
-## 5. SpecificationItems
+## 5. specification_items
 
 ### Обязательные поля
 
-- SpecificationItemId
-- SpecificationId
-- MaterialId
-- QuantityPerUnit
-- WastePercent
+- specification_item_id
+- specification_id
+- material_id
+- quantity_per_unit
+- waste_percent
 
 ### Ограничения
 
-- SpecificationItemId - PRIMARY KEY;
-- SpecificationId - FOREIGN KEY;
-- MaterialId - FOREIGN KEY;
-- SpecificationId + MaterialId - UNIQUE;
-- QuantityPerUnit > 0;
-- WastePercent >= 0;
-- WastePercent <= 100;
-- WastePercent - DEFAULT 0.
+- specification_item_id - PRIMARY KEY;
+- specification_id - FOREIGN KEY;
+- material_id - FOREIGN KEY;
+- specification_id + material_id - UNIQUE;
+- quantity_per_unit > 0;
+- waste_percent >= 0;
+- waste_percent <= 100;
+- waste_percent - DEFAULT 0.
 
 ### Удаление
 
 Specification:
 
-`SpecificationItems.SpecificationId -> Specifications.SpecificationId ON DELETE CASCADE`
+`specification_items.specification_id -> specifications.specification_id ON DELETE CASCADE`
 
 Material:
 
-`SpecificationItems.MaterialId -> Materials.MaterialId ON DELETE RESTRICT`
+`specification_items.material_id -> materials.material_id ON DELETE RESTRICT`
 
 ---
 
-## 6. ProductionOrders
+## 6. production_orders
 
 ### Обязательные поля
 
-- ProductionOrderId
-- OrderNumber
-- SpecificationId
-- PlannedQuantity
-- PlannedStartAt
-- PlannedEndAt
-- Status
-- CreatedAt
+- production_order_id
+- order_number
+- specification_id
+- planned_quantity
+- planned_start_at
+- planned_end_at
+- status
+- created_at
 
 ### Ограничения
 
-- ProductionOrderId - PRIMARY KEY;
-- OrderNumber - UNIQUE;
-- SpecificationId - FOREIGN KEY;
-- PlannedQuantity > 0;
-- PlannedEndAt не может быть меньше PlannedStartAt;
-- CreatedAt - DEFAULT CURRENT_TIMESTAMP.
+- production_order_id - PRIMARY KEY;
+- order_number - UNIQUE;
+- specification_id - FOREIGN KEY;
+- planned_quantity > 0;
+- planned_end_at не может быть меньше planned_start_at;
+- created_at - DEFAULT CURRENT_TIMESTAMP.
 
 ### Удаление
 
 Specification:
 
-`ProductionOrders.SpecificationId -> Specifications.SpecificationId ON DELETE RESTRICT`
+`production_orders.specification_id -> specifications.specification_id ON DELETE RESTRICT`
 
 Производственный заказ нельзя удалить, если существуют связанные партии:
 
-`ProductionBatches.ProductionOrderId -> ProductionOrders.ProductionOrderId ON DELETE RESTRICT`
+`production_batches.production_order_id -> production_orders.production_order_id ON DELETE RESTRICT`
 
 ---
 
-## 7. ProductionBatches
+## 7. production_batches
 
 ### Обязательные поля
 
-- BatchId
-- ProductionOrderId
-- BatchNumber
-- PlannedQuantity
-- ActualQuantity
-- StartedAt
-- CompletedAt
-- Status
+- batch_id
+- production_order_id
+- batch_number
+- planned_quantity
+- actual_quantity
+- started_at
+- completed_at
+- status
 
 ### Ограничения
 
-- BatchId - PRIMARY KEY;
-- ProductionOrderId - FOREIGN KEY;
-- ProductionOrderId + BatchNumber - UNIQUE;
-- PlannedQuantity > 0;
-- ActualQuantity >= 0;
-- CompletedAt не может быть меньше StartedAt.
+- batch_id - PRIMARY KEY;
+- production_order_id - FOREIGN KEY;
+- production_order_id + batch_number - UNIQUE;
+- planned_quantity > 0;
+- actual_quantity >= 0;
+- completed_at не может быть меньше started_at.
 
 ### Удаление
 
 ProductionOrder:
 
-`ProductionBatches.ProductionOrderId -> ProductionOrders.ProductionOrderId ON DELETE RESTRICT`
+`production_batches.production_order_id -> production_orders.production_order_id ON DELETE RESTRICT`
 
 Партию нельзя удалить, если существуют связанные:
 
@@ -216,76 +216,76 @@ ProductionOrder:
 - записи расхода материалов;
 - проверки качества.
 
-`BatchOperations.BatchId -> ProductionBatches.BatchId ON DELETE RESTRICT`
+`batch_operations.batch_id -> production_batches.batch_id ON DELETE RESTRICT`
 
-`MaterialUsage.BatchId -> ProductionBatches.BatchId ON DELETE RESTRICT`
+`material_usage.batch_id -> production_batches.batch_id ON DELETE RESTRICT`
 
-`QualityChecks.BatchId -> ProductionBatches.BatchId ON DELETE RESTRICT`
+`quality_checks.batch_id -> production_batches.batch_id ON DELETE RESTRICT`
 
 ---
 
-## 8. ProductionLines
+## 8. production_lines
 
 ### Обязательные поля
 
-- ProductionLineId
-- Code
-- Name
-- Location
-- Status
-- Description
+- production_line_id
+- code
+- name
+- location
+- status
+- description
 
 ### Ограничения
 
-- ProductionLineId - PRIMARY KEY;
-- Code - UNIQUE;
-- Status - DEFAULT Active.
+- production_line_id - PRIMARY KEY;
+- code - UNIQUE;
+- status - DEFAULT Active.
 
 ### Удаление
 
 Производственную линию нельзя удалить, если она использовалась в технологических операциях.
 
-`BatchOperations.ProductionLineId -> ProductionLines.ProductionLineId ON DELETE RESTRICT`
+`batch_operations.production_line_id -> production_lines.production_line_id ON DELETE RESTRICT`
 
 ---
 
-## 9. Operations
+## 9. operations
 
 ### Обязательные поля
 
-- OperationId
-- Code
-- Name
-- Description
+- operation_id
+- code
+- name
+- description
 
 ### Ограничения
 
-- OperationId - PRIMARY KEY;
-- Code - UNIQUE.
+- operation_id - PRIMARY KEY;
+- code - UNIQUE.
 
 ### Удаление
 
 Тип операции нельзя удалить, если существуют записи о ее выполнении.
 
-`BatchOperations.OperationId -> Operations.OperationId ON DELETE RESTRICT`
+`batch_operations.operation_id -> operations.operation_id ON DELETE RESTRICT`
 
 ---
 
-## 10. Employees
+## 10. employees
 
 ### Обязательные поля
 
-- EmployeeId
-- PersonnelNumber
-- FullName
-- Position
-- IsActive
+- employee_id
+- personnel_number
+- full_name
+- position
+- is_active
 
 ### Ограничения
 
-- EmployeeId - PRIMARY KEY;
-- PersonnelNumber - UNIQUE;
-- IsActive - DEFAULT true.
+- employee_id - PRIMARY KEY;
+- personnel_number - UNIQUE;
+- is_active - DEFAULT true.
 
 ### Удаление
 
@@ -293,116 +293,116 @@ ProductionOrder:
 
 Для уволенного сотрудника:
 
-`IsActive = false`
+`is_active = false`
 
 Связанные внешние ключи:
 
-`Shifts.SupervisorEmployeeId -> Employees.EmployeeId ON DELETE RESTRICT`
+`shifts.supervisor_employee_id -> employees.employee_id ON DELETE RESTRICT`
 
-`BatchOperations.EmployeeId -> Employees.EmployeeId ON DELETE RESTRICT`
+`batch_operations.employee_id -> employees.employee_id ON DELETE RESTRICT`
 
-`MaterialUsage.EmployeeId -> Employees.EmployeeId ON DELETE RESTRICT`
+`material_usage.employee_id -> employees.employee_id ON DELETE RESTRICT`
 
-`QualityChecks.EmployeeId -> Employees.EmployeeId ON DELETE RESTRICT`
+`quality_checks.employee_id -> employees.employee_id ON DELETE RESTRICT`
 
 ---
 
-## 11. Shifts
+## 11. shifts
 
 ### Обязательные поля
 
-- ShiftId
-- ShiftDate
-- ShiftNumber
-- StartedAt
-- CompletedAt
-- SupervisorEmployeeId
+- shift_id
+- shift_date
+- shift_number
+- started_at
+- completed_at
+- supervisor_employee_id
 
 ### Ограничения
 
-- ShiftId - PRIMARY KEY;
-- SupervisorEmployeeId - FOREIGN KEY;
-- ShiftDate + ShiftNumber - UNIQUE;
-- ShiftNumber > 0;
-- CompletedAt > StartedAt.
+- shift_id - PRIMARY KEY;
+- supervisor_employee_id - FOREIGN KEY;
+- shift_date + shift_number - UNIQUE;
+- shift_number > 0;
+- completed_at > started_at.
 
-ShiftDate обозначает производственный день и может отличаться от календарной даты завершения ночной смены.
+shift_date обозначает производственный день и может отличаться от календарной даты завершения ночной смены.
 
 ### Удаление
 
 Employee:
 
-`Shifts.SupervisorEmployeeId -> Employees.EmployeeId ON DELETE RESTRICT`
+`shifts.supervisor_employee_id -> employees.employee_id ON DELETE RESTRICT`
 
 Смена не удаляется, если существуют связанные производственные операции:
 
-`BatchOperations.ShiftId -> Shifts.ShiftId ON DELETE RESTRICT`
+`batch_operations.shift_id -> shifts.shift_id ON DELETE RESTRICT`
 
 ---
 
-## 12. BatchOperations
+## 12. batch_operations
 
 ### Обязательные поля
 
-- BatchOperationId
-- BatchId
-- OperationId
-- ProductionLineId
-- EmployeeId
-- ShiftId
-- SequenceNo
-- StartedAt
-- CompletedAt
-- ProcessedQuantity
-- Status
+- batch_operation_id
+- batch_id
+- operation_id
+- production_line_id
+- employee_id
+- shift_id
+- sequence_no
+- started_at
+- completed_at
+- processed_quantity
+- status
 
 ### Ограничения
 
-- BatchOperationId - PRIMARY KEY;
+- batch_operation_id - PRIMARY KEY;
 - все ссылки являются FOREIGN KEY;
-- BatchId + SequenceNo - UNIQUE;
-- SequenceNo > 0;
-- ProcessedQuantity >= 0;
-- CompletedAt не может быть меньше StartedAt.
+- batch_id + sequence_no - UNIQUE;
+- sequence_no > 0;
+- processed_quantity >= 0;
+- completed_at не может быть меньше started_at.
 
 ### Удаление
 
 Для всех внешних ключей используется ON DELETE RESTRICT.
 
-`BatchOperations.BatchId -> ProductionBatches.BatchId ON DELETE RESTRICT`
+`batch_operations.batch_id -> production_batches.batch_id ON DELETE RESTRICT`
 
-`BatchOperations.OperationId -> Operations.OperationId ON DELETE RESTRICT`
+`batch_operations.operation_id -> operations.operation_id ON DELETE RESTRICT`
 
-`BatchOperations.ProductionLineId -> ProductionLines.ProductionLineId ON DELETE RESTRICT`
+`batch_operations.production_line_id -> production_lines.production_line_id ON DELETE RESTRICT`
 
-`BatchOperations.EmployeeId -> Employees.EmployeeId ON DELETE RESTRICT`
+`batch_operations.employee_id -> employees.employee_id ON DELETE RESTRICT`
 
-`BatchOperations.ShiftId -> Shifts.ShiftId ON DELETE RESTRICT`
+`batch_operations.shift_id -> shifts.shift_id ON DELETE RESTRICT`
 
 История выполнения производственных операций должна сохраняться.
 
 ---
 
-## 13. MaterialUsage
+## 13. material_usage
 
 ### Обязательные поля
 
-- MaterialUsageId
-- BatchId
-- MaterialId
-- EmployeeId
-- QuantityUsed
-- MaterialLotNumber
-- RecordedAt
+- material_usage_id
+- batch_id
+- material_id
+- employee_id
+- quantity_used
+- material_lot_number
+- recorded_at
 
 ### Ограничения
 
-- MaterialUsageId - PRIMARY KEY;
-- BatchId - FOREIGN KEY;
-- MaterialId - FOREIGN KEY;
-- EmployeeId - FOREIGN KEY;
-- QuantityUsed > 0;
-- RecordedAt - DEFAULT CURRENT_TIMESTAMP.
+- material_usage_id - PRIMARY KEY;
+- batch_id - FOREIGN KEY;
+- material_id - FOREIGN KEY;
+- employee_id - FOREIGN KEY;
+- quantity_used > 0;
+- recorded_at - DEFAULT CURRENT_TIMESTAMP.
 
 Несколько записей расхода одного материала для одной партии разрешены.
 
@@ -410,32 +410,32 @@ Employee:
 
 Для внешних ключей используется ON DELETE RESTRICT.
 
-`MaterialUsage.BatchId -> ProductionBatches.BatchId ON DELETE RESTRICT`
+`material_usage.batch_id -> production_batches.batch_id ON DELETE RESTRICT`
 
-`MaterialUsage.MaterialId -> Materials.MaterialId ON DELETE RESTRICT`
+`material_usage.material_id -> materials.material_id ON DELETE RESTRICT`
 
-`MaterialUsage.EmployeeId -> Employees.EmployeeId ON DELETE RESTRICT`
+`material_usage.employee_id -> employees.employee_id ON DELETE RESTRICT`
 
 ---
 
-## 14. QualityChecks
+## 14. quality_checks
 
 ### Обязательные поля
 
-- QualityCheckId
-- BatchId
-- EmployeeId
-- CheckStage
-- CheckedAt
-- Result
-- Notes
+- quality_check_id
+- batch_id
+- employee_id
+- check_stage
+- checked_at
+- result
+- notes
 
 ### Ограничения
 
-- QualityCheckId - PRIMARY KEY;
-- BatchId - FOREIGN KEY;
-- EmployeeId - FOREIGN KEY;
-- CheckedAt - DEFAULT CURRENT_TIMESTAMP.
+- quality_check_id - PRIMARY KEY;
+- batch_id - FOREIGN KEY;
+- employee_id - FOREIGN KEY;
+- checked_at - DEFAULT CURRENT_TIMESTAMP.
 
 Для одной партии допускается несколько проверок одного этапа.
 
@@ -443,64 +443,64 @@ Employee:
 
 Batch:
 
-`QualityChecks.BatchId -> ProductionBatches.BatchId ON DELETE RESTRICT`
+`quality_checks.batch_id -> production_batches.batch_id ON DELETE RESTRICT`
 
 Employee:
 
-`QualityChecks.EmployeeId -> Employees.EmployeeId ON DELETE RESTRICT`
+`quality_checks.employee_id -> employees.employee_id ON DELETE RESTRICT`
 
-При удалении проверки качества связанные записи Defects удаляются автоматически:
+При удалении проверки качества связанные записи defects удаляются автоматически:
 
-`Defects.QualityCheckId -> QualityChecks.QualityCheckId ON DELETE CASCADE`
+`defects.quality_check_id -> quality_checks.quality_check_id ON DELETE CASCADE`
 
 ---
 
-## 15. DefectTypes
+## 15. defect_types
 
 ### Обязательные поля
 
-- DefectTypeId
-- Code
-- Name
-- Severity
-- Description
-- IsActive
+- defect_type_id
+- code
+- name
+- severity
+- description
+- is_active
 
 ### Ограничения
 
-- DefectTypeId - PRIMARY KEY;
-- Code - UNIQUE;
-- IsActive - DEFAULT true.
+- defect_type_id - PRIMARY KEY;
+- code - UNIQUE;
+- is_active - DEFAULT true.
 
 ### Удаление
 
 Тип дефекта нельзя удалить, если он использован в зарегистрированном браке.
 
-`Defects.DefectTypeId -> DefectTypes.DefectTypeId ON DELETE RESTRICT`
+`defects.defect_type_id -> defect_types.defect_type_id ON DELETE RESTRICT`
 
 Вместо удаления используется:
 
-`IsActive = false`
+`is_active = false`
 
 ---
 
-## 16. Defects
+## 16. defects
 
 ### Обязательные поля
 
-- DefectId
-- QualityCheckId
-- DefectTypeId
-- Quantity
-- Description
+- defect_id
+- quality_check_id
+- defect_type_id
+- quantity
+- description
 
 ### Ограничения
 
-- DefectId - PRIMARY KEY;
-- QualityCheckId - FOREIGN KEY;
-- DefectTypeId - FOREIGN KEY;
-- Quantity > 0;
-- QualityCheckId + DefectTypeId - UNIQUE.
+- defect_id - PRIMARY KEY;
+- quality_check_id - FOREIGN KEY;
+- defect_type_id - FOREIGN KEY;
+- quantity > 0;
+- quality_check_id + defect_type_id - UNIQUE.
 
 Один тип дефекта в рамках одной проверки должен храниться одной записью с суммарным количеством.
 
@@ -508,11 +508,11 @@ Employee:
 
 QualityCheck:
 
-`Defects.QualityCheckId -> QualityChecks.QualityCheckId ON DELETE CASCADE`
+`defects.quality_check_id -> quality_checks.quality_check_id ON DELETE CASCADE`
 
 DefectType:
 
-`Defects.DefectTypeId -> DefectTypes.DefectTypeId ON DELETE RESTRICT`
+`defects.defect_type_id -> defect_types.defect_type_id ON DELETE RESTRICT`
 
 ---
 

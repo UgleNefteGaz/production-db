@@ -29,21 +29,21 @@
 
 В проекте используются 15 сущностей:
 
-1. Products
-2. Materials
-3. Specifications
-4. SpecificationItems
-5. ProductionOrders
-6. ProductionBatches
-7. ProductionLines
-8. Operations
-9. BatchOperations
-10. Employees
-11. Shifts
-12. MaterialUsage
-13. QualityChecks
-14. DefectTypes
-15. Defects
+1. products
+2. materials
+3. specifications
+4. specification_items
+5. production_orders
+6. production_batches
+7. production_lines
+8. operations
+9. batch_operations
+10. employees
+11. shifts
+12. material_usage
+13. quality_checks
+14. defect_types
+15. defects
 
 ## 4. Основные бизнес-процессы
 

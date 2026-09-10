@@ -14,9 +14,9 @@
 
 Для этого используются:
 
-- Products;
-- Specifications;
-- ProductionOrders.
+- products;
+- specifications;
+- production_orders.
 
 Производственный заказ связан с конкретной версией спецификации, что позволяет определить, по каким нормативам должен выполняться выпуск продукции.
 
@@ -45,7 +45,7 @@
 
 ### Как БД решает задачу
 
-Используется таблица ProductionBatches.
+Используется таблица production_batches.
 
 Каждая производственная партия связана с одним производственным заказом и содержит:
 
@@ -79,11 +79,11 @@
 
 Используются:
 
-- Operations;
-- BatchOperations;
-- ProductionBatches.
+- operations;
+- batch_operations;
+- production_batches.
 
-BatchOperations фиксирует факт выполнения операции над конкретной партией.
+batch_operations фиксирует факт выполнения операции над конкретной партией.
 
 ### Пример
 
@@ -115,8 +115,8 @@ BatchOperations фиксирует факт выполнения операци�
 
 Используются:
 
-- ProductionLines;
-- BatchOperations.
+- production_lines;
+- batch_operations.
 
 Каждая выполненная операция связана с конкретной производственной линией.
 
@@ -141,14 +141,14 @@ BatchOperations фиксирует факт выполнения операци�
 
 Используются:
 
-- Materials;
-- SpecificationItems;
-- MaterialUsage;
-- ProductionBatches.
+- materials;
+- specification_items;
+- material_usage;
+- production_batches.
 
-SpecificationItems содержит нормативный расход материала.
+specification_items содержит нормативный расход материала.
 
-MaterialUsage содержит фактический расход.
+material_usage содержит фактический расход.
 
 ### Пример
 
@@ -178,9 +178,9 @@ MaterialUsage содержит фактический расход.
 
 Используются:
 
-- QualityChecks;
-- ProductionBatches;
-- Employees.
+- quality_checks;
+- production_batches;
+- employees.
 
 Для каждой проверки хранится:
 
@@ -213,13 +213,13 @@ MaterialUsage содержит фактический расход.
 
 Используются:
 
-- QualityChecks;
-- Defects;
-- DefectTypes.
+- quality_checks;
+- defects;
+- defect_types.
 
-DefectTypes хранит справочник типов дефектов.
+defect_types хранит справочник типов дефектов.
 
-Defects хранит факты обнаружения конкретных дефектов.
+defects хранит факты обнаружения конкретных дефектов.
 
 ### Пример
 
@@ -246,13 +246,13 @@ Defects хранит факты обнаружения конкретных де
 
 Используются:
 
-- ProductionOrders;
-- ProductionBatches.
+- production_orders;
+- production_batches.
 
 Для каждой партии хранятся:
 
-- PlannedQuantity;
-- ActualQuantity.
+- planned_quantity;
+- actual_quantity.
 
 ### Пример
 
@@ -274,7 +274,7 @@ Defects хранит факты обнаружения конкретных де
 
 ### Как БД решает задачу
 
-Данные из Defects и DefectTypes можно агрегировать по:
+Данные из defects и defect_types можно агрегировать по:
 
 - партиям;
 - типам дефектов;
@@ -303,9 +303,9 @@ Defects хранит факты обнаружения конкретных де
 
 Используются:
 
-- Shifts;
-- Employees;
-- BatchOperations.
+- shifts;
+- employees;
+- batch_operations.
 
 По данным выполненных операций можно определить количество обработанной продукции за смену.
 

@@ -6,22 +6,22 @@
 
 Основная цепочка данных:
 
-Products
--> Specifications
--> ProductionOrders
--> ProductionBatches
--> BatchOperations / MaterialUsage / QualityChecks
--> Defects
+products
+-> specifications
+-> production_orders
+-> production_batches
+-> batch_operations / material_usage / quality_checks
+-> defects
 
 ---
 
 ## 2. Связи между сущностями
 
-### Products -> Specifications
+### products -> specifications
 
 Кардинальность:
 
-`Products 1:N Specifications`
+`products 1:N specifications`
 
 Один продукт может иметь несколько версий технологической спецификации.
 
@@ -29,15 +29,15 @@ Products
 
 Связь:
 
-`Specifications.ProductId -> Products.ProductId`
+`specifications.product_id -> products.product_id`
 
 ---
 
-### Specifications -> SpecificationItems
+### specifications -> specification_items
 
 Кардинальность:
 
-`Specifications 1:N SpecificationItems`
+`specifications 1:N specification_items`
 
 Одна спецификация содержит несколько строк состава.
 
@@ -45,15 +45,15 @@ Products
 
 Связь:
 
-`SpecificationItems.SpecificationId -> Specifications.SpecificationId`
+`specification_items.specification_id -> specifications.specification_id`
 
 ---
 
-### Materials -> SpecificationItems
+### materials -> specification_items
 
 Кардинальность:
 
-`Materials 1:N SpecificationItems`
+`materials 1:N specification_items`
 
 Один материал может использоваться во многих спецификациях.
 
@@ -61,17 +61,17 @@ Products
 
 Связь:
 
-`SpecificationItems.MaterialId -> Materials.MaterialId`
+`specification_items.material_id -> materials.material_id`
 
-В совокупности SpecificationItems реализует связь M:N между Specifications и Materials.
+В совокупности specification_items реализует связь M:N между specifications и materials.
 
 ---
 
-### Specifications -> ProductionOrders
+### specifications -> production_orders
 
 Кардинальность:
 
-`Specifications 1:N ProductionOrders`
+`specifications 1:N production_orders`
 
 Одна спецификация может использоваться во многих производственных заказах.
 
@@ -79,15 +79,15 @@ Products
 
 Связь:
 
-`ProductionOrders.SpecificationId -> Specifications.SpecificationId`
+`production_orders.specification_id -> specifications.specification_id`
 
 ---
 
-### ProductionOrders -> ProductionBatches
+### production_orders -> production_batches
 
 Кардинальность:
 
-`ProductionOrders 1:N ProductionBatches`
+`production_orders 1:N production_batches`
 
 Один производственный заказ может быть разделен на несколько производственных партий.
 
@@ -95,95 +95,95 @@ Products
 
 Связь:
 
-`ProductionBatches.ProductionOrderId -> ProductionOrders.ProductionOrderId`
+`production_batches.production_order_id -> production_orders.production_order_id`
 
 ---
 
-### ProductionBatches -> BatchOperations
+### production_batches -> batch_operations
 
 Кардинальность:
 
-`ProductionBatches 1:N BatchOperations`
+`production_batches 1:N batch_operations`
 
 Одна производственная партия проходит несколько технологических операций.
 
-Каждая запись BatchOperations описывает выполнение одной операции над одной партией.
+Каждая запись batch_operations описывает выполнение одной операции над одной партией.
 
 Связь:
 
-`BatchOperations.BatchId -> ProductionBatches.BatchId`
+`batch_operations.batch_id -> production_batches.batch_id`
 
 ---
 
-### Operations -> BatchOperations
+### operations -> batch_operations
 
 Кардинальность:
 
-`Operations 1:N BatchOperations`
+`operations 1:N batch_operations`
 
 Один тип технологической операции может выполняться над многими производственными партиями.
 
-Каждая запись BatchOperations относится к одному типу операции.
+Каждая запись batch_operations относится к одному типу операции.
 
 Связь:
 
-`BatchOperations.OperationId -> Operations.OperationId`
+`batch_operations.operation_id -> operations.operation_id`
 
 ---
 
-### ProductionLines -> BatchOperations
+### production_lines -> batch_operations
 
 Кардинальность:
 
-`ProductionLines 1:N BatchOperations`
+`production_lines 1:N batch_operations`
 
 Одна производственная линия может использоваться для выполнения многих операций.
 
-Каждая запись BatchOperations связана с одной производственной линией.
+Каждая запись batch_operations связана с одной производственной линией.
 
 Связь:
 
-`BatchOperations.ProductionLineId -> ProductionLines.ProductionLineId`
+`batch_operations.production_line_id -> production_lines.production_line_id`
 
 ---
 
-### Employees -> BatchOperations
+### employees -> batch_operations
 
 Кардинальность:
 
-`Employees 1:N BatchOperations`
+`employees 1:N batch_operations`
 
 Один сотрудник может участвовать во многих производственных операциях.
 
-Каждая запись BatchOperations содержит одного ответственного сотрудника.
+Каждая запись batch_operations содержит одного ответственного сотрудника.
 
 Связь:
 
-`BatchOperations.EmployeeId -> Employees.EmployeeId`
+`batch_operations.employee_id -> employees.employee_id`
 
 ---
 
-### Shifts -> BatchOperations
+### shifts -> batch_operations
 
 Кардинальность:
 
-`Shifts 1:N BatchOperations`
+`shifts 1:N batch_operations`
 
 В рамках одной смены может выполняться множество производственных операций.
 
-Каждая запись BatchOperations относится к одной смене.
+Каждая запись batch_operations относится к одной смене.
 
 Связь:
 
-`BatchOperations.ShiftId -> Shifts.ShiftId`
+`batch_operations.shift_id -> shifts.shift_id`
 
 ---
 
-### Employees -> Shifts
+### employees -> shifts
 
 Кардинальность:
 
-`Employees 1:N Shifts`
+`employees 1:N shifts`
 
 Один сотрудник может быть руководителем многих смен.
 
@@ -191,15 +191,15 @@ Products
 
 Связь:
 
-`Shifts.SupervisorEmployeeId -> Employees.EmployeeId`
+`shifts.supervisor_employee_id -> employees.employee_id`
 
 ---
 
-### ProductionBatches -> MaterialUsage
+### production_batches -> material_usage
 
 Кардинальность:
 
-`ProductionBatches 1:N MaterialUsage`
+`production_batches 1:N material_usage`
 
 Для одной производственной партии может существовать несколько записей фактического расхода материалов.
 
@@ -207,31 +207,31 @@ Products
 
 Связь:
 
-`MaterialUsage.BatchId -> ProductionBatches.BatchId`
+`material_usage.batch_id -> production_batches.batch_id`
 
 ---
 
-### Materials -> MaterialUsage
+### materials -> material_usage
 
 Кардинальность:
 
-`Materials 1:N MaterialUsage`
+`materials 1:N material_usage`
 
 Один материал может расходоваться во многих производственных партиях.
 
-Каждая запись MaterialUsage относится к одному материалу.
+Каждая запись material_usage относится к одному материалу.
 
 Связь:
 
-`MaterialUsage.MaterialId -> Materials.MaterialId`
+`material_usage.material_id -> materials.material_id`
 
 ---
 
-### Employees -> MaterialUsage
+### employees -> material_usage
 
 Кардинальность:
 
-`Employees 1:N MaterialUsage`
+`employees 1:N material_usage`
 
 Один сотрудник может зарегистрировать множество операций расхода материала.
 
@@ -239,15 +239,15 @@ Products
 
 Связь:
 
-`MaterialUsage.EmployeeId -> Employees.EmployeeId`
+`material_usage.employee_id -> employees.employee_id`
 
 ---
 
-### ProductionBatches -> QualityChecks
+### production_batches -> quality_checks
 
 Кардинальность:
 
-`ProductionBatches 1:N QualityChecks`
+`production_batches 1:N quality_checks`
 
 Одна производственная партия может проходить несколько проверок качества.
 
@@ -255,15 +255,15 @@ Products
 
 Связь:
 
-`QualityChecks.BatchId -> ProductionBatches.BatchId`
+`quality_checks.batch_id -> production_batches.batch_id`
 
 ---
 
-### Employees -> QualityChecks
+### employees -> quality_checks
 
 Кардинальность:
 
-`Employees 1:N QualityChecks`
+`employees 1:N quality_checks`
 
 Один сотрудник может проводить множество проверок качества.
 
@@ -271,39 +271,39 @@ Products
 
 Связь:
 
-`QualityChecks.EmployeeId -> Employees.EmployeeId`
+`quality_checks.employee_id -> employees.employee_id`
 
 ---
 
-### QualityChecks -> Defects
+### quality_checks -> defects
 
 Кардинальность:
 
-`QualityChecks 1:N Defects`
+`quality_checks 1:N defects`
 
 В рамках одной проверки качества может быть обнаружено несколько типов дефектов.
 
-Каждая запись Defects относится к одной проверке качества.
+Каждая запись defects относится к одной проверке качества.
 
 Связь:
 
-`Defects.QualityCheckId -> QualityChecks.QualityCheckId`
+`defects.quality_check_id -> quality_checks.quality_check_id`
 
 ---
 
-### DefectTypes -> Defects
+### defect_types -> defects
 
 Кардинальность:
 
-`DefectTypes 1:N Defects`
+`defect_types 1:N defects`
 
 Один тип дефекта может встречаться во многих проверках качества.
 
-Каждая запись Defects относится к одному типу дефекта.
+Каждая запись defects относится к одному типу дефекта.
 
 Связь:
 
-`Defects.DefectTypeId -> DefectTypes.DefectTypeId`
+`defects.defect_type_id -> defect_types.defect_type_id`
 
 ---
 
@@ -313,17 +313,17 @@ Products
 
 Они реализуются через промежуточные сущности.
 
-### Specifications <-> Materials
+### specifications <-> materials
 
 Связь реализуется через:
 
-`SpecificationItems`
+`specification_items`
 
-### ProductionBatches <-> Operations
+### production_batches <-> operations
 
 Связь реализуется через:
 
-`BatchOperations`
+`batch_operations`
 
 ---
 
@@ -331,10 +331,10 @@ Products
 
 Ключевыми сущностями производственного процесса являются:
 
-- ProductionOrders;
-- ProductionBatches;
-- BatchOperations;
-- MaterialUsage;
-- QualityChecks.
+- production_orders;
+- production_batches;
+- batch_operations;
+- material_usage;
+- quality_checks.
 
-ProductionBatches является центральной сущностью фактического производственного процесса, так как с ней связаны технологические операции, расход материалов и контроль качества.
+production_batches является центральной сущностью фактического производственного процесса, так как с ней связаны технологические операции, расход материалов и контроль качества.
