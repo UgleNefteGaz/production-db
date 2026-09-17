@@ -19,6 +19,9 @@ CREATE UNIQUE INDEX uq_specifications_one_active_per_product
     ON specifications (product_id)
     WHERE status = 'Active';
 
+COMMENT ON INDEX uq_specifications_one_active_per_product IS
+'Частичный уникальный индекс: допускает только одну активную спецификацию для каждого продукта';
+
 
 -- ============================================================
 -- PRODUCTION ORDERS
