@@ -63,6 +63,7 @@ production-db/
 │   ├── business-tasks.md
 │   ├── indexes-analysis.md
 │   ├── triggers.md
+│   ├── replication.md
 │   └── worklog.md
 ├── sql/
 │   ├── queries.sql
@@ -70,7 +71,11 @@ production-db/
 │   ├── functions.sql
 │   ├── indexes.sql
 │   ├── constraints.sql
-│   └── triggers.sql
+│   ├── triggers.sql
+│   └── replication/
+│       ├── physical-primary.sql
+│       ├── logical-publisher.sql
+│       └── logical-subscriber.sql
 └── images/
     └── .gitkeep
 ```
@@ -84,6 +89,7 @@ production-db/
 - `sql/constraints.sql` - 8 дополнительных `CHECK`-ограничений и 1 частичный уникальный индекс.
 - `sql/triggers.sql` - 6 пользовательских триггеров для межтабличных бизнес-правил.
 - `sql/queries.sql` - практические SQL-примеры.
+- `sql/replication/` - SQL-команды и проверки для лабораторной работы по репликации.
 
 ## Реализованные механизмы
 
@@ -142,6 +148,25 @@ production-db/
 
 Изменяющие демонстрационные запросы выполняются в транзакциях с `ROLLBACK`, чтобы сохранять исходные тестовые данные.
 
+### Репликация
+
+В проекте реализованы два механизма PostgreSQL 18:
+
+- физическая streaming replication через `physical_replica_slot`;
+- hot standby с `recovery_min_apply_delay = '5min'`;
+- логическая репликация через `demo_publication` и `demo_subscription`;
+- одновременная работа physical и logical replication при `wal_level = logical`.
+
+Архитектура лабораторного стенда:
+
+```text
+production-db-postgres  :5434  Primary / Publisher
+production-db-physical  :5435  Physical Standby, delay 5 min
+production-db-logical   :5436  Logical Subscriber
+```
+
+Подробности и результаты проверок: `docs/replication.md`.
+
 ## Тестовые данные
 
 После загрузки `db/seed.sql` база содержит:
@@ -189,6 +214,7 @@ db/seed.sql
 - `docs/additional-constraints.md` - дополнительные ограничения бизнес-логики.
 - `docs/indexes-analysis.md` - проектирование и проверка индексов.
 - `docs/triggers.md` - межтабличные бизнес-правила и триггеры.
+- `docs/replication.md` - физическая и логическая репликация PostgreSQL.
 - `docs/business-tasks.md` - бизнес-задачи базы данных.
 - `docs/worklog.md` - хронология разработки.
 
@@ -203,6 +229,7 @@ db/seed.sql
 - полнотекстовый поиск;
 - межтабличные бизнес-правила и триггеры;
 - практические SQL-запросы;
+- физическая и логическая репликация PostgreSQL;
 - проверка полного развёртывания базы с нуля.
 
 Следующие этапы:

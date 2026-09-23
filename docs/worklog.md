@@ -121,6 +121,46 @@ sql/indexes.sql      14
 sql/constraints.sql   1 частичный уникальный индекс
 ```
 
+## 18.09.2026
+
+### Выполнено
+
+- создана отдельная Docker-сеть `production-replication`;
+- основной PostgreSQL-кластер подключён к сети репликации;
+- создан пользователь `replicator` с правом `REPLICATION`;
+- в `pg_hba.conf` разрешена физическая репликация из сети `172.31.0.0/16`;
+- через `pg_basebackup` подготовлен отдельный physical standby;
+- создан и активирован physical replication slot `physical_replica_slot`;
+- запущен контейнер `production-db-physical` на host port `5435`;
+- подтверждены `pg_is_in_recovery() = true` и состояние `streaming`;
+- настроен `recovery_min_apply_delay = '5min'`;
+- практическим тестом подтверждена задержка применения WAL примерно на 5 минут;
+- Primary переключён с `wal_level = replica` на `wal_level = logical`;
+- подтверждено, что physical streaming replication продолжила работать после переключения;
+- создана база `logical_replication_lab`;
+- создана таблица `replication_demo` и добавлены 3 исходные строки;
+- создан пользователь `logical_replicator`;
+- создана публикация `demo_publication`;
+- запущен отдельный кластер `production-db-logical` на host port `5436`;
+- на Subscriber заранее создана совместимая таблица `replication_demo`;
+- создана подписка `demo_subscription`;
+- создан logical replication slot с output plugin `pgoutput`;
+- подтверждена первоначальная синхронизация 3 существующих строк;
+- после создания подписки на Publisher добавлены ещё 2 строки;
+- подтверждено появление новых строк на Subscriber;
+- одновременно активны physical и logical replication slots.
+
+### Результат
+
+Реализованы оба требуемых вида репликации PostgreSQL:
+
+```text
+physical_replica_slot -> production-db-physical -> delay 5 min
+demo_subscription     -> production-db-logical  -> logical replication
+```
+
+Подробное описание находится в `docs/replication.md`.
+
 ## Текущее состояние
 
 Завершены:
@@ -131,6 +171,7 @@ sql/constraints.sql   1 частичный уникальный индекс
 - индексация и полнотекстовый поиск;
 - межтабличные триггеры;
 - практические DML-запросы;
+- физическая и логическая репликация;
 - проверка воспроизводимого развёртывания.
 
 Следующие этапы:
