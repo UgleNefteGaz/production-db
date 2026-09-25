@@ -518,6 +518,51 @@ JOIN production_batches pb
 JOIN employees e
     ON e.personnel_number = 'EMP004';
 
+-- ============================================================
+-- JSONB MEASUREMENTS FOR QUALITY CHECKS
+-- ============================================================
+
+UPDATE quality_checks qc
+SET measurements = '{
+    "ph": 5.6,
+    "color": "colorless",
+    "appearance": "transparent",
+    "temperature_c": 22.6,
+    "viscosity_mpa_s": 3200
+}'::jsonb
+FROM production_batches pb
+WHERE qc.batch_id = pb.batch_id
+  AND pb.batch_number = 'BATCH-004'
+  AND qc.checked_at = TIMESTAMP '2026-08-05 17:00';
+
+
+UPDATE quality_checks qc
+SET measurements = '{
+    "ph": 4.8,
+    "appearance": "cream",
+    "consistency": "homogeneous",
+    "temperature_c": 23.1,
+    "viscosity_mpa_s": 18500
+}'::jsonb
+FROM production_batches pb
+WHERE qc.batch_id = pb.batch_id
+  AND pb.batch_number = 'BATCH-010'
+  AND qc.checked_at = TIMESTAMP '2026-07-20 17:10';
+
+
+UPDATE quality_checks qc
+SET measurements = '{
+    "ph": 5.7,
+    "appearance": "transparent",
+    "density_g_cm3": 1.03,
+    "temperature_c": 22.9,
+    "viscosity_mpa_s": 5400
+}'::jsonb
+FROM production_batches pb
+WHERE qc.batch_id = pb.batch_id
+  AND pb.batch_number = 'BATCH-013'
+  AND qc.checked_at = TIMESTAMP '2026-09-01 17:20';
+
 
 -- ============================================================
 -- 16. DEFECTS

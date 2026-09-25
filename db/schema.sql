@@ -372,6 +372,10 @@ CREATE TABLE quality_checks (
     checked_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     result quality_check_result NOT NULL,
     notes text,
+    measurements jsonb NOT NULL DEFAULT '{}'::jsonb,
+
+    CONSTRAINT chk_quality_check_measurements_object
+        CHECK (jsonb_typeof(measurements) = 'object'),
 
     CONSTRAINT fk_quality_checks_batch
         FOREIGN KEY (batch_id)

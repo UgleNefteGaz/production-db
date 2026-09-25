@@ -271,6 +271,7 @@ Table quality_checks {
   checked_at timestamp [not null, default: `CURRENT_TIMESTAMP`]
   result quality_check_result [not null]
   notes text
+  measurements jsonb [not null, default: `'{}'::jsonb`]
 
   Note: 'Результаты контроля качества производственной партии'
 }
